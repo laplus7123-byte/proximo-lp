@@ -96,13 +96,6 @@
     toggle.setAttribute('aria-pressed', String(paused));
     toggle.innerHTML = paused ? '画像の動きを再開する <span aria-hidden="true">▶</span>' : '画像の動きを止める <span aria-hidden="true">Ⅱ</span>';
   });
-  // 動画URLの提供前は先頭へ移動せず、その場に準備中の案内を表示。
-  $$('[data-video]').forEach(link => link.addEventListener('click', event => {
-    if (link.getAttribute('href') !== '#') return;
-    event.preventDefault();
-    const notice = document.getElementById(link.getAttribute('aria-describedby'));
-    if (notice) notice.hidden = false;
-  }));
   $$('.faq-list details').forEach(details => {
     const summary = $('summary', details);
     let animation, targetOpen = details.open;
@@ -211,9 +204,10 @@
     // 長いカードは全体を上へ送り、下端まで読んでから次のカードを入れる。
     media.add({ motion: '(prefers-reduced-motion: no-preference)', desktopTall: '(min-height: 600px) and (hover: hover)',
       touch: '(hover: none) and (pointer: coarse)', portrait: '(orientation: portrait)',
-      phone: '(max-width: 599px)', desktop: '(min-width: 1024px)' }, context => {
+      phone: '(max-width: 599px)', phoneTall: '(max-width: 599px) and (min-height: 560px) and (hover: hover)',
+      desktop: '(min-width: 1024px)' }, context => {
       measureViewport();
-      if (!context.conditions.motion || !(context.conditions.touch ? viewportHeight >= 600 : context.conditions.desktopTall)) return;
+      if (!context.conditions.motion || viewportHeight < (context.conditions.phone ? 560 : 600)) return;
       const panels = $$('.course-panel'), links = $$('.course-navigation a');
       const stage = $('.course-stage'), track = $('.course-track');
       const gap = () => innerWidth < 600 ? 10 : 14;
@@ -241,7 +235,7 @@
         const reading = stage.clientHeight * .52, entering = stage.clientHeight * .62;
         panels.forEach((panel, i) => {
           changes.push(time);
-          // ナビは各カードの冒頭へ。小さい画面でも冒頭とボタンを順に読める。
+          // ナビは各カードの冒頭へ。スマホでは本文全体が一画面に収まる。
           stops.push(time + reading * .25);
           const travel = readTravel(panel, i);
           // フォント読込・画面幅変更後にカードが伸びても、refresh時に再計算する。

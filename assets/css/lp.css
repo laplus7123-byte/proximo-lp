@@ -149,3 +149,21 @@ main{overflow-x:clip}
 .courses-stacked{overflow:visible;padding-bottom:0}
 .courses-stacked .course-track{height:calc(var(--course-scroll,0px) + var(--viewport-height,100svh))}
 .courses-stacked .course-stage{position:sticky;top:0}
+
+/* スマホの講座カードは、見出しから本文までを一画面に収める。 */
+@media(max-width:599px){
+  .course-panel-inner{padding:20px 22px;gap:14px}
+  .course-thumbnails{display:none}
+  .course-image{max-height:190px;aspect-ratio:auto;object-fit:contain}
+  .course-copy h3,.courses-stacked .course-copy h3{font-size:24px;line-height:1.4;margin-bottom:10px}
+  .course-kicker{font-size:11px;margin-bottom:6px}
+  .course-message,.courses-stacked .course-message{font-size:18px;line-height:1.6;margin-bottom:10px}
+  .course-description{font-size:13px;line-height:1.8}
+  .courses-stacked .course-panel-inner{
+    display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;gap:14px;
+    height:min(520px,calc(var(--viewport-height,100svh) - var(--header) - 140px));
+    min-height:0;padding:18px 22px;
+  }
+  .courses-stacked .course-visual{height:100%;min-height:0}
+  .courses-stacked .course-image{height:100%;max-height:none}
+}
