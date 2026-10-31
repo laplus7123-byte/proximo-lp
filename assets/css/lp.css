@@ -8,7 +8,7 @@
  */
 :root{--navy:#051928;--blue:#0063bd;--gray:#f4f5f7;--line:#dde1e6;--muted:#46505c;--green:#06c755;--red:#b3261e;--header:88px}
 *,*::before,*::after{box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:110px}
+html{scroll-behavior:auto;scroll-padding-top:110px}
 body{margin:0;background:#fff;color:var(--navy);font-family:"M PLUS 1",sans-serif;font-size:16px;line-height:1.85;-webkit-font-smoothing:antialiased}
 body,button{font-feature-settings:"palt"}
 img,svg{display:block;max-width:100%}img{height:auto}a{color:inherit;text-decoration:none}button{font:inherit;color:inherit;cursor:pointer}button,a{-webkit-tap-highlight-color:transparent}
@@ -63,14 +63,70 @@ h1,h2,h3,p,figure{margin:0}h1,h2,h3{font-weight:800;line-height:1.4;word-break:k
 .final-copy h2 span{white-space:nowrap}
 @media(max-width:599px){.final-copy h2{font-size:clamp(21px,6.65vw,27px)}}
 
-/* 2026-10-31 FV再調整: 一人の主人公をスクロールに連動して上から下へ切り替える。 */
-.hero-scroll{display:block;position:relative;padding-top:var(--header);min-height:0;max-height:none;height:auto;overflow:visible;background:white}.hero-stage{--hero-cut:0%;position:relative;height:calc(100svh - var(--header));min-height:640px;background:#fff}.hero-scroll .hero-copy{position:absolute;z-index:4;inset:70px auto auto max(64px,calc((100vw - 1200px)/2));width:45%;max-width:550px;padding:0;margin:0;pointer-events:auto}.hero-scroll .hero-brand-name{font-size:12px;margin-bottom:24px;line-height:1.6}.hero-scroll h1{font-size:0;line-height:1}.hero-scroll .hero-logo{width:100%;height:auto}.hero-scroll .hero-description{margin-top:34px}.hero-scroll .hero-message{font-size:30px;line-height:1.65;margin:0;letter-spacing:-.02em}.hero-scroll .hero-lead{font-size:14px;margin:24px 0 0;line-height:2;max-width:none}.hero-scroll .hero-actions{position:absolute;z-index:5;left:max(64px,calc((100vw - 1200px)/2));top:auto;bottom:92px;padding:0;width:auto}.hero-scroll .hero-cta{min-width:340px}.hero-scroll .hero-actions .text-link{margin-top:18px}.hero-transform{position:absolute;inset:0 0 0 auto;width:50%;height:100%;overflow:hidden}.hero-scene{position:absolute;inset:0;overflow:hidden}.hero-scene>img,.hero-reveal>img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center bottom}.hero-reveal{position:absolute;inset:0;clip-path:inset(0 0 var(--hero-cut) 0);will-change:clip-path}.hero-state{position:absolute;left:28px;bottom:35px;z-index:3;display:grid;font-size:14px;font-weight:700;line-height:1.6;background:white;padding:8px 14px}.hero-state>span{grid-area:1/1;transition:opacity .25s}.hero-state-athlete{opacity:0}.hero-state-business{opacity:1}.hero-stage[data-phase="athlete"] .hero-state-athlete{opacity:1}.hero-stage[data-phase="athlete"] .hero-state-business{opacity:0}.hero-progress{position:absolute;right:30px;top:50%;width:2px;height:110px;background:#c9dae7;transform:translateY(-50%);display:none}.hero-progress>span{display:block;width:100%;height:100%;background:var(--blue);transform:scaleY(var(--hero-progress,1));transform-origin:top}.hero-is-pinned .hero-progress{display:block}.hero-scroll-guide{position:absolute;z-index:5;bottom:32px;left:max(64px,calc((100vw - 1200px)/2));display:flex;align-items:center;gap:20px;font-size:11px;font-weight:700;line-height:1.5;padding:6px 0}.hero-scroll-guide>span:last-child{font-size:21px}.hero-guide-motion{display:none}.hero-is-pinned .hero-guide-motion{display:inline}.hero-is-pinned .hero-guide-static{display:none}.hero-summary{background:white;position:relative}.hero-scroll .hero-bottom{position:relative;inset:auto;height:78px}.hero-mobile-lead{display:none}
-@media(min-width:1441px){.hero-scroll .hero-copy{top:80px}.hero-scroll .hero-message{font-size:34px}}
-@media(max-width:1199px) and (min-width:600px){.hero-scroll .hero-copy{left:40px;width:45%;top:55px}.hero-scroll .hero-message{font-size:26px}.hero-scroll .hero-lead{font-size:12px}.hero-scroll .hero-actions,.hero-scroll-guide{left:40px}.hero-scroll .hero-cta{min-width:290px;font-size:13px}.hero-state{left:20px;bottom:30px}.hero-progress{right:18px}}
-@media(max-width:899px) and (min-width:600px){.hero-scroll .hero-copy{width:44%;top:55px}.hero-scroll .hero-message{font-size:23px}.hero-scroll .hero-description{margin-top:30px}.hero-scroll .hero-lead{font-size:12px;line-height:2}.hero-transform{width:52%}.hero-scroll .hero-actions{bottom:100px}.hero-scroll .hero-brand-name{font-size:9px}}
-@media(max-width:599px){.hero-scroll{display:block;padding-top:var(--header)}.hero-stage{height:calc(100svh - var(--header));min-height:620px;display:flex;flex-direction:column;padding:22px 20px 12px;gap:0}.hero-scroll .hero-copy{position:relative;inset:auto;width:100%;max-width:none;flex:none;padding:0;margin:0}.hero-scroll .hero-brand-name{font-size:9px;margin-bottom:14px;line-height:1.6}.hero-scroll .hero-description{margin-top:22px}.hero-scroll .hero-message{font-size:24px;line-height:1.55;letter-spacing:-.025em}.hero-scroll .hero-lead{display:none}.hero-transform{position:relative;inset:auto;width:100%;height:auto;flex:1;min-height:235px;overflow:hidden;margin:6px 0 0}.hero-scene{inset:0}.hero-scene>img,.hero-reveal>img{object-position:center center}.hero-state{left:0;bottom:18px;padding:6px 8px;font-size:11px}.hero-progress{right:6px;height:74px}.hero-scroll .hero-actions{position:relative;inset:auto;flex:none;padding:0;width:100%;margin-top:10px}.hero-scroll .hero-cta{min-width:0;width:100%;min-height:60px;padding-block:10px;font-size:14px}.hero-scroll .hero-actions .text-link{display:none}.hero-scroll-guide{position:relative;inset:auto;flex:none;justify-content:center;font-size:10px;gap:14px;padding:12px 0 0;min-height:36px}.hero-scroll-guide>span:last-child{font-size:18px}.hero-mobile-lead{display:block;font-size:13px;line-height:2;padding:34px 20px 10px}.hero-scroll .hero-bottom{height:70px;padding:18px 20px}.hero-summary{padding-bottom:8px}}
-@media(prefers-reduced-motion:reduce){.hero-reveal{clip-path:none;will-change:auto}.hero-progress,.hero-guide-motion{display:none!important}.hero-guide-static{display:inline!important}.hero-state-athlete{opacity:0!important}.hero-state-business{opacity:1!important}}
-@media(max-width:599px){.hero-scroll .hero-copy{order:0}.hero-scroll .hero-transform{order:1}.hero-scroll .hero-actions{order:2}.hero-scroll .hero-scroll-guide{order:3}}
+/* 2026-11-01 FV: PCは全幅の一枚絵、スマホはイラスト部分だけを固定。 */
+.hero-scroll{display:block;position:relative;padding-top:var(--header);min-height:0;max-height:none;height:auto;overflow:visible;background:white}
+.hero-stage{--hero-cut:0%;position:relative;height:calc(var(--viewport-height,100svh) - var(--header));min-height:640px;background:white;isolation:isolate}
+.hero-scroll .hero-copy{position:absolute;z-index:4;inset:60px auto auto max(64px,calc((100vw - 1320px)/2));width:44%;max-width:580px;padding:0;margin:0}
+.hero-scroll .hero-brand-name{font-size:12px;margin-bottom:24px;line-height:1.6}
+.hero-scroll h1{font-size:0;line-height:1}
+.hero-scroll .hero-logo{width:100%;height:auto}
+.hero-scroll .hero-description{margin-top:34px}
+.hero-scroll .hero-message{font-size:30px;line-height:1.65;margin:0;letter-spacing:-.02em}
+.hero-scroll .hero-lead{font-size:14px;margin:24px 0 0;line-height:2;max-width:none}
+.hero-scroll .hero-actions{position:absolute;z-index:5;left:max(64px,calc((100vw - 1320px)/2));top:auto;bottom:100px;padding:0;width:auto}
+.hero-scroll .hero-cta{min-width:340px}
+.hero-scroll .hero-actions .text-link{margin-top:18px}
+.hero-transform{position:absolute;inset:0;width:100%;height:100%;overflow:hidden}
+.hero-scene,.hero-scene picture{position:absolute;inset:0;overflow:hidden}
+.hero-scene img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:right bottom}
+.hero-reveal{position:absolute;inset:0;clip-path:inset(0 0 var(--hero-cut) 0);will-change:clip-path}
+.hero-state{position:absolute;right:30px;top:24px;z-index:3;display:grid;font-size:13px;font-weight:700;line-height:1.6;background:white;padding:8px 14px}
+.hero-state>span{grid-area:1/1;transition:opacity .25s}
+.hero-state-athlete{opacity:0}.hero-state-business{opacity:1}
+.hero-stage[data-phase="athlete"] .hero-state-athlete{opacity:1}
+.hero-stage[data-phase="athlete"] .hero-state-business{opacity:0}
+.hero-progress{position:absolute;right:30px;top:50%;width:2px;height:110px;background:#c9dae7;transform:translateY(-50%);display:none}
+.hero-progress>span{display:block;width:100%;height:100%;background:var(--blue);transform:scaleY(var(--hero-progress,1));transform-origin:top}
+.hero-is-pinned .hero-progress{display:block}
+.hero-scroll-guide{position:absolute;z-index:5;bottom:32px;left:max(64px,calc((100vw - 1320px)/2));display:flex;align-items:center;gap:20px;font-size:11px;font-weight:700;line-height:1.5;padding:8px 12px;background:white}
+.hero-scroll-guide>span:last-child{font-size:21px}
+.hero-guide-motion{display:none}.hero-is-pinned .hero-guide-motion{display:inline}.hero-is-pinned .hero-guide-static{display:none}
+.hero-summary{background:white;position:relative}
+.hero-scroll .hero-bottom{position:relative;inset:auto;height:78px}
+.hero-mobile-lead{display:none}
+@media(min-width:1441px){.hero-scroll .hero-copy{top:70px}.hero-scroll .hero-message{font-size:34px}}
+/* 横に長い画面でも人物の頭・足を切らず、通常スクロールで全景を見せる。 */
+@media(min-width:900px) and (min-aspect-ratio:2/1){.hero-stage{height:max(640px,50vw)}}
+@media(max-width:1199px) and (min-width:900px){
+  .hero-scroll .hero-copy{left:40px;top:55px;width:44%}
+  .hero-scroll .hero-message{font-size:26px}.hero-scroll .hero-lead{font-size:13px}
+  .hero-scroll .hero-actions,.hero-scroll-guide{left:40px}.hero-scroll .hero-cta{min-width:290px;font-size:13px}
+}
+@media(max-width:899px){
+  .hero-stage{display:block;height:auto;min-height:0;padding:0}
+  .hero-scroll .hero-copy{position:relative;inset:auto;width:100%;max-width:600px;padding:28px 20px 24px;margin:0 auto}
+  .hero-scroll .hero-brand-name{font-size:10px;margin-bottom:16px;line-height:1.6}
+  .hero-scroll .hero-description{margin-top:24px}
+  .hero-scroll .hero-message{font-size:24px;line-height:1.55;letter-spacing:-.025em}
+  .hero-scroll .hero-lead{display:none}
+  .hero-transform{position:relative;inset:auto;width:100%;height:calc(var(--viewport-height,100svh) - var(--header));min-height:0;margin:0;overflow:hidden;background:white}
+  .hero-scene{bottom:48px}
+  .hero-scene img{object-position:center center}
+  .hero-state{inset:16px auto auto 20px;font-size:11px;padding:6px 8px}
+  .hero-progress{right:16px;height:74px}
+  .hero-scroll-guide{inset:auto auto 6px 50%;transform:translateX(-50%);width:max-content;max-width:calc(100% - 40px);gap:14px;font-size:10px;padding:6px 12px}
+  .hero-scroll-guide>span:last-child{font-size:18px}
+  .hero-scroll .hero-actions{position:relative;inset:auto;width:100%;max-width:600px;padding:24px 20px 0;margin:auto}
+  .hero-scroll .hero-cta{min-width:0;width:100%;min-height:60px;padding-block:10px;font-size:14px}
+  .hero-scroll .hero-actions .text-link{display:none}
+  .hero-mobile-lead{display:block;font-size:13px;line-height:2;padding:28px 20px 10px;max-width:600px;margin:auto}
+  .hero-scroll .hero-bottom{height:70px;padding:18px 20px}.hero-summary{padding-bottom:8px}
+}
+@media(min-width:600px) and (max-width:899px){.hero-scene img{object-fit:contain}}
+@media(prefers-reduced-motion:reduce){
+  .hero-reveal{clip-path:none;will-change:auto}.hero-progress,.hero-guide-motion{display:none!important}
+  .hero-guide-static{display:inline!important}.hero-state-athlete{opacity:0!important}.hero-state-business{opacity:1!important}
+}
 
 /* 2026-10-31 講座カードを下から積み重ねる。影・傾きは付けない。 */
 .courses-stacked{--stack-gap:14px}.courses-stacked .course-stage{height:100svh;min-height:0;overflow:hidden;isolation:isolate}.courses-stacked .course-panels{height:100%;position:relative}.courses-stacked .course-panel{position:absolute;inset:calc(var(--header) + 18px + var(--stack-index) * var(--stack-gap)) 0 auto;display:block;padding:0;margin:0;min-height:0;height:auto;visibility:visible!important;opacity:1;will-change:transform}.courses-stacked .course-panel-inner{height:auto;min-height:min(610px,calc(100svh - var(--header) - 140px));max-height:none;padding:44px 55px;gap:55px;border-radius:60px 8px 60px 8px}.courses-stacked .course-navigation{z-index:20;bottom:16px;min-height:44px;gap:32px}.courses-stacked .course-navigation a{min-height:44px;display:flex;align-items:center;padding:10px 2px;font-size:12px}.courses-stacked .video-notice{position:absolute;margin-top:4px;font-size:10px}.courses-stacked .course-copy{position:relative}
@@ -84,7 +140,6 @@ h1,h2,h3,p,figure{margin:0}h1,h2,h3{font-weight:800;line-height:1.4;word-break:k
 .season-section + .start-section{padding-top:0}
 
 /* スマホのツールバー開閉で固定区間の高さやスクロール位置を変えない。 */
-.hero-stage{height:calc(var(--viewport-height,100svh) - var(--header))}
 .courses-stacked .course-stage{height:var(--viewport-height,100svh)}
 /* 登場前の横移動アニメーションをページのスクロール幅に含めない。 */
 main{overflow-x:clip}

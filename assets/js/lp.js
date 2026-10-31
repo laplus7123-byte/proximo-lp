@@ -138,30 +138,40 @@
   if (canAnimate) {
     const media = gsap.matchMedia();
     // FV: 表示位置と顔・ポーズを揃えた2枚を、上から下へワイプする。
-    // スクロール量に直結し、戻す操作にも追従。短い画面とreduced-motionでは静止したスーツ姿。
+    // スマホは全幅のイラストだけを固定し、ロゴ・説明・CTAは通常の流れに置く。
     media.add({ motion: '(prefers-reduced-motion: no-preference)',
       desktopTall: '(min-height: 740px) and (hover: hover)',
-      touch: '(hover: none) and (pointer: coarse)', portrait: '(orientation: portrait)' }, context => {
+      compact: '(max-width: 899px)', touch: '(hover: none) and (pointer: coarse)',
+      portrait: '(orientation: portrait)' }, context => {
       measureViewport();
-      if (!context.conditions.motion || !(context.conditions.touch ? viewportHeight >= 740 : context.conditions.desktopTall)) return;
+      const compact = context.conditions.compact;
+      const tallEnough = compact ? viewportHeight >= 500 : viewportHeight >= 740;
+      if (!context.conditions.motion || !tallEnough) return;
       const hero = $('#top'), stage = $('.hero-stage');
-      hero.classList.add('hero-is-pinned');
-      stage.dataset.phase = 'athlete';
-      gsap.set(stage, { '--hero-cut': '100%', '--hero-progress': 0 });
-      const tl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: {
-        id: 'proximo-hero', trigger: stage,
-        start: () => `top top+=${header.offsetHeight}`,
-        end: () => `+=${Math.round(viewportHeight * 1.45)}`,
-        pin: true, scrub: .35, anticipatePin: 1, invalidateOnRefresh: true,
-        onUpdate: self => {
-          stage.style.setProperty('--hero-progress', self.progress);
-          stage.dataset.phase = self.progress < .52 ? 'athlete' : 'business';
-          queueChrome();
-        }
-      } });
-      tl.to({}, { duration: 1 }, 0)
-        .fromTo(stage, { '--hero-cut': '100%' }, { '--hero-cut': '0%', duration: .72, immediateRender: true }, .12);
+      const pinTarget = compact ? $('.hero-transform') : stage;
+      context.add('buildHero', () => {
+        if (!compact && pinTarget.offsetHeight > viewportHeight - header.offsetHeight + 2) return;
+        hero.classList.add('hero-is-pinned');
+        stage.dataset.phase = 'athlete';
+        gsap.set(stage, { '--hero-cut': '100%', '--hero-progress': 0 });
+        const tl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: {
+          id: 'proximo-hero', trigger: pinTarget,
+          start: () => `top top+=${header.offsetHeight}`,
+          end: () => `+=${Math.round(viewportHeight * (compact ? 1.1 : 1.45))}`,
+          pin: true, scrub: .35, anticipatePin: 1,
+          onUpdate: self => {
+            stage.style.setProperty('--hero-progress', self.progress);
+            stage.dataset.phase = self.progress < .52 ? 'athlete' : 'business';
+            queueChrome();
+          }
+        } });
+        tl.to({}, { duration: 1 }, 0)
+          .fromTo(stage, { '--hero-cut': '100%' }, { '--hero-cut': '0%', duration: .72, immediateRender: true }, .12);
+      });
+      // Safariのpicture・可変高のレイアウトが確定したフレームで測る。
+      const heroFrame = requestAnimationFrame(() => context.buildHero());
       return () => {
+        cancelAnimationFrame(heroFrame);
         hero.classList.remove('hero-is-pinned');
         stage.removeAttribute('data-phase');
         stage.style.removeProperty('--hero-cut');
@@ -288,6 +298,21 @@
     event.preventDefault();
     scrollTo({ top: courseTrigger.start + (courseTrigger.end - courseTrigger.start) * courseStops[index], behavior: 'smooth' });
   }));
+  // ページ内リンクだけ滑らかに移動。全体のsmooth指定はSafariの再計測時に位置を飛ばす。
+  $$('a[href^="#"]').filter(link => !link.closest('.course-navigation')).forEach(link => {
+    link.addEventListener('click', event => {
+      const target = document.getElementById(link.hash.slice(1));
+      if (!target || event.defaultPrevented) return;
+      event.preventDefault();
+      const top = Math.max(0, scrollY + target.getBoundingClientRect().top - header.offsetHeight - 16);
+      history.pushState(null, '', link.hash);
+      scrollTo({ top, behavior: motion.matches ? 'instant' : 'smooth' });
+      if (event.detail === 0) {
+        if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+        target.focus({ preventScroll: true });
+      }
+    });
+  });
   motion.addEventListener('change', () => { if (motion.matches) finishOpening(); queueChrome(); });
   document.fonts?.ready.then(() => { if (canAnimate) ScrollTrigger.refresh(); });
   addEventListener('load', () => { if (canAnimate) ScrollTrigger.refresh(); updateChrome(); });
