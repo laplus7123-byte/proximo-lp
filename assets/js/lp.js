@@ -215,7 +215,7 @@
       measureViewport();
       if (!context.conditions.motion || !(context.conditions.touch ? viewportHeight >= 600 : context.conditions.desktopTall)) return;
       const panels = $$('.course-panel'), links = $$('.course-navigation a');
-      const stage = $('.course-stage');
+      const stage = $('.course-stage'), track = $('.course-track');
       const gap = () => innerWidth < 600 ? 10 : 14;
       const cardTop = i => header.offsetHeight + 18 + i * gap();
       const readTravel = (panel, i) => Math.max(0, cardTop(i) + $('.course-panel-inner', panel).offsetHeight - (stage.clientHeight - 82));
@@ -247,8 +247,9 @@
           // フォント読込・画面幅変更後にカードが伸びても、refresh時に再計算する。
           timeline.fromTo(panel, { y: 0 }, { y: () => -readTravel(panel, i), duration: Math.max(travel, stage.clientHeight * .18), immediateRender: false }, time + reading * .45);
           time += Math.max(travel, stage.clientHeight * .18);
-          time += reading;
-          readEnds.push(time - reading * .15);
+          // 最後のカードは本文の移動が終わった地点から通常スクロールへつなぐ。
+          time += reading * (i === panels.length - 1 ? .45 : 1);
+          readEnds.push(i === panels.length - 1 ? time : time - reading * .15);
           if (i < panels.length - 1) {
             const next = panels[i + 1];
             transitions.push([time, time + entering]);
@@ -262,12 +263,14 @@
           }
         });
         timeline.to({}, { duration: time }, 0);
+        // 固定解除時のtransform切替をなくし、実際のページの流れで次へ進める。
+        gsap.set(track, { '--course-scroll': `${time}px` });
         courseStops = stops.map(t => t / time);
         // 読める最前面のカードのみフォーカス可能にする。
         const changePoints = changes.map((t, i) => (i ? t - entering * .35 : 0) / time);
         courseTrigger = ScrollTrigger.create({
-          id: 'proximo-courses', trigger: stage, animation: timeline, start: 'top top', end: () => `+=${time}`,
-          pin: true, scrub: .4, anticipatePin: 1, invalidateOnRefresh: true,
+          id: 'proximo-courses', trigger: track, animation: timeline, start: 'top top', end: () => `+=${time}`,
+          scrub: .4, invalidateOnRefresh: true,
           onUpdate: self => {
             let active = 0;
             changePoints.forEach((point, i) => { if (self.progress >= point) active = i; });

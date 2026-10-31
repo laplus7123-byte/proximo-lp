@@ -144,3 +144,8 @@ h1,h2,h3,p,figure{margin:0}h1,h2,h3{font-weight:800;line-height:1.4;word-break:k
 /* 登場前の横移動アニメーションをページのスクロール幅に含めない。 */
 main{overflow-x:clip}
 @media(max-width:599px){.courses-stacked .course-navigation{bottom:0;left:0;right:0;padding:0 20px 13px}}
+
+/* 最終カードから次の本文へ、ブラウザ標準のstickyで途切れずにつなぐ。 */
+.courses-stacked{overflow:visible;padding-bottom:0}
+.courses-stacked .course-track{height:calc(var(--course-scroll,0px) + var(--viewport-height,100svh))}
+.courses-stacked .course-stage{position:sticky;top:0}
