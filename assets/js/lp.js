@@ -6,9 +6,36 @@
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const { gsap, ScrollTrigger } = window;
   const canAnimate = Boolean(gsap && ScrollTrigger);
+  const touchViewport = matchMedia('(hover: none) and (pointer: coarse)');
+  let viewportWidth = 0, viewportHeight = 0, viewportTimer;
+  function measureViewport() {
+    const width = document.documentElement.clientWidth;
+    // スマホのアドレスバー開閉では固定演出の長さを変えない。
+    if (viewportHeight && touchViewport.matches && width === viewportWidth) return false;
+    const probe = document.createElement('div');
+    probe.style.cssText = 'position:fixed;visibility:hidden;pointer-events:none;height:100svh;width:0';
+    document.body.append(probe);
+    const height = probe.offsetHeight || innerHeight;
+    probe.remove();
+    const changed = width !== viewportWidth || height !== viewportHeight;
+    viewportWidth = width; viewportHeight = height;
+    document.documentElement.style.setProperty('--viewport-height', `${height}px`);
+    return changed;
+  }
+  measureViewport();
   const header = $('#site-header'), floating = $('#floating-line'), curriculum = $('#journey');
   let courseTrigger = null, courseStops = [], framePending = false, refreshTimer;
-  if (canAnimate) gsap.registerPlugin(ScrollTrigger);
+  if (canAnimate) {
+    gsap.registerPlugin(ScrollTrigger);
+    ScrollTrigger.config({ ignoreMobileResize: true });
+  }
+  addEventListener('resize', () => {
+    if (!measureViewport()) return;
+    const stage = $('.courses-pinned .course-stage');
+    if (stage) stage.style.height = `${viewportHeight}px`;
+    clearTimeout(viewportTimer);
+    viewportTimer = setTimeout(() => { if (canAnimate) ScrollTrigger.refresh(); }, 180);
+  }, { passive: true });
 
   function updateChrome() {
     framePending = false;
@@ -112,7 +139,11 @@
     const media = gsap.matchMedia();
     // FV: 表示位置と顔・ポーズを揃えた2枚を、上から下へワイプする。
     // スクロール量に直結し、戻す操作にも追従。短い画面とreduced-motionでは静止したスーツ姿。
-    media.add('(min-height: 740px) and (prefers-reduced-motion: no-preference)', () => {
+    media.add({ motion: '(prefers-reduced-motion: no-preference)',
+      desktopTall: '(min-height: 740px) and (hover: hover)',
+      touch: '(hover: none) and (pointer: coarse)', portrait: '(orientation: portrait)' }, context => {
+      measureViewport();
+      if (!context.conditions.motion || !(context.conditions.touch ? viewportHeight >= 740 : context.conditions.desktopTall)) return;
       const hero = $('#top'), stage = $('.hero-stage');
       hero.classList.add('hero-is-pinned');
       stage.dataset.phase = 'athlete';
@@ -120,7 +151,7 @@
       const tl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: {
         id: 'proximo-hero', trigger: stage,
         start: () => `top top+=${header.offsetHeight}`,
-        end: () => `+=${Math.round(innerHeight * 1.45)}`,
+        end: () => `+=${Math.round(viewportHeight * 1.45)}`,
         pin: true, scrub: .35, anticipatePin: 1, invalidateOnRefresh: true,
         onUpdate: self => {
           stage.style.setProperty('--hero-progress', self.progress);
@@ -168,15 +199,21 @@
     });
     // 講座カード: 下から入る次のカードを、残した前のカードの上へ積み重ねる。
     // 長いカードは全体を上へ送り、下端まで読んでから次のカードを入れる。
-    media.add({ motion: '(prefers-reduced-motion: no-preference)', tall: '(min-height: 600px)',
+    media.add({ motion: '(prefers-reduced-motion: no-preference)', desktopTall: '(min-height: 600px) and (hover: hover)',
+      touch: '(hover: none) and (pointer: coarse)', portrait: '(orientation: portrait)',
       phone: '(max-width: 599px)', desktop: '(min-width: 1024px)' }, context => {
-      if (!context.conditions.motion || !context.conditions.tall) return;
+      measureViewport();
+      if (!context.conditions.motion || !(context.conditions.touch ? viewportHeight >= 600 : context.conditions.desktopTall)) return;
       const panels = $$('.course-panel'), links = $$('.course-navigation a');
       const stage = $('.course-stage');
       const gap = () => innerWidth < 600 ? 10 : 14;
       const cardTop = i => header.offsetHeight + 18 + i * gap();
       const readTravel = (panel, i) => Math.max(0, cardTop(i) + $('.course-panel-inner', panel).offsetHeight - (stage.clientHeight - 82));
       curriculum.classList.add('courses-pinned', 'courses-stacked');
+      // WebKitではクラス切替直後のsvh・背景色の取得が不安定になるため、先に確定。
+      gsap.set(stage, { height: viewportHeight });
+      gsap.set($$('.course-panel-inner', stage), { backgroundColor: '#f4f5f7' });
+      stage.getBoundingClientRect();
       panels.forEach((panel, i) => {
         panel.style.setProperty('--stack-index', i);
         gsap.set(panel, { zIndex: i + 1, transformOrigin: '50% 0%', y: i ? () => stage.clientHeight + 50 : 0 });
@@ -186,50 +223,55 @@
         links.forEach((link, i) => { link.classList.toggle('is-active', i === index); if (i === index) link.setAttribute('aria-current', 'step'); else link.removeAttribute('aria-current'); });
       }
       activate(0);
-      const timeline = gsap.timeline({ paused: true, defaults: { ease: 'none' } });
-      const stops = [], changes = [], readEnds = [], transitions = [];
-      let time = 0;
-      const reading = stage.clientHeight * .52, entering = stage.clientHeight * .62;
-      panels.forEach((panel, i) => {
-        changes.push(time);
-        // ナビは各カードの冒頭へ。小さい画面でも冒頭とボタンを順に読める。
-        stops.push(time + reading * .25);
-        const travel = readTravel(panel, i);
-        // フォント読込・画面幅変更後にカードが伸びても、refresh時に再計算する。
-        timeline.fromTo(panel, { y: 0 }, { y: () => -readTravel(panel, i), duration: Math.max(travel, stage.clientHeight * .18), immediateRender: false }, time + reading * .45);
-        time += Math.max(travel, stage.clientHeight * .18);
-        time += reading;
-        readEnds.push(time - reading * .15);
-        if (i < panels.length - 1) {
-          const next = panels[i + 1];
-          transitions.push([time, time + entering]);
-          timeline.fromTo(next, { y: () => stage.clientHeight + 50 }, { y: 0, duration: entering, immediateRender: false }, time);
-          // 既読カードを少し奥へ。透明に消さず、上辺を残す。
-          for (let j = 0; j <= i; j++) {
-            timeline.to(panels[j], { y: 0, scale: 1 - (i - j + 1) * .025, duration: entering }, time);
-            timeline.to($('.course-panel-inner', panels[j]), { backgroundColor: j === i ? '#e5edf4' : '#d6e2ed', duration: entering }, time);
+      // Safariがflex・画像の幅を確定したフレームで、読書区間の長さを測る。
+      context.add('buildCourses', () => {
+        const timeline = gsap.timeline({ paused: true, defaults: { ease: 'none' } });
+        const stops = [], changes = [], readEnds = [], transitions = [];
+        let time = 0;
+        const reading = stage.clientHeight * .52, entering = stage.clientHeight * .62;
+        panels.forEach((panel, i) => {
+          changes.push(time);
+          // ナビは各カードの冒頭へ。小さい画面でも冒頭とボタンを順に読める。
+          stops.push(time + reading * .25);
+          const travel = readTravel(panel, i);
+          // フォント読込・画面幅変更後にカードが伸びても、refresh時に再計算する。
+          timeline.fromTo(panel, { y: 0 }, { y: () => -readTravel(panel, i), duration: Math.max(travel, stage.clientHeight * .18), immediateRender: false }, time + reading * .45);
+          time += Math.max(travel, stage.clientHeight * .18);
+          time += reading;
+          readEnds.push(time - reading * .15);
+          if (i < panels.length - 1) {
+            const next = panels[i + 1];
+            transitions.push([time, time + entering]);
+            timeline.fromTo(next, { y: () => stage.clientHeight + 50 }, { y: 0, duration: entering, immediateRender: false }, time);
+            // 既読カードを少し奥へ。透明に消さず、上辺を残す。
+            for (let j = 0; j <= i; j++) {
+              timeline.to(panels[j], { y: 0, scale: 1 - (i - j + 1) * .025, duration: entering }, time);
+              timeline.to($('.course-panel-inner', panels[j]), { backgroundColor: j === i ? '#e5edf4' : '#d6e2ed', duration: entering }, time);
+            }
+            time += entering;
           }
-          time += entering;
-        }
+        });
+        timeline.to({}, { duration: time }, 0);
+        courseStops = stops.map(t => t / time);
+        // 読める最前面のカードのみフォーカス可能にする。
+        const changePoints = changes.map((t, i) => (i ? t - entering * .35 : 0) / time);
+        courseTrigger = ScrollTrigger.create({
+          id: 'proximo-courses', trigger: stage, animation: timeline, start: 'top top', end: () => `+=${time}`,
+          pin: true, scrub: .4, anticipatePin: 1, invalidateOnRefresh: true,
+          onUpdate: self => {
+            let active = 0;
+            changePoints.forEach((point, i) => { if (self.progress >= point) active = i; });
+            activate(active); queueChrome();
+          }
+        });
+        // QAとナビで同じ読書位置を参照。個別カードの高さに追従する。
+        stage.dataset.courseStops = JSON.stringify(courseStops);
+        stage.dataset.courseReadEnds = JSON.stringify(readEnds.map(t => t / time));
+        stage.dataset.courseTransitions = JSON.stringify(transitions.map(pair => pair.map(t => t / time)));
       });
-      timeline.to({}, { duration: time }, 0);
-      courseStops = stops.map(t => t / time);
-      // 読める最前面のカードのみフォーカス可能にする。
-      const changePoints = changes.map((t, i) => (i ? t - entering * .35 : 0) / time);
-      courseTrigger = ScrollTrigger.create({
-        id: 'proximo-courses', trigger: stage, animation: timeline, start: 'top top', end: () => `+=${time}`,
-        pin: true, scrub: .4, anticipatePin: 1, invalidateOnRefresh: true,
-        onUpdate: self => {
-          let active = 0;
-          changePoints.forEach((point, i) => { if (self.progress >= point) active = i; });
-          activate(active); queueChrome();
-        }
-      });
-      // QAとナビで同じ読書位置を参照。個別カードの高さに追従する。
-      stage.dataset.courseStops = JSON.stringify(courseStops);
-      stage.dataset.courseReadEnds = JSON.stringify(readEnds.map(t => t / time));
-      stage.dataset.courseTransitions = JSON.stringify(transitions.map(pair => pair.map(t => t / time)));
+      const buildFrame = requestAnimationFrame(() => context.buildCourses());
       return () => {
+        cancelAnimationFrame(buildFrame);
         courseTrigger = null; courseStops = [];
         curriculum.classList.remove('courses-pinned', 'courses-stacked');
         delete stage.dataset.courseStops;

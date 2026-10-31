@@ -82,3 +82,10 @@ h1,h2,h3,p,figure{margin:0}h1,h2,h3{font-weight:800;line-height:1.4;word-break:k
 
 /* 一期生募集の削除後、白背景のセクション間で余白を重ねない。 */
 .season-section + .start-section{padding-top:0}
+
+/* スマホのツールバー開閉で固定区間の高さやスクロール位置を変えない。 */
+.hero-stage{height:calc(var(--viewport-height,100svh) - var(--header))}
+.courses-stacked .course-stage{height:var(--viewport-height,100svh)}
+/* 登場前の横移動アニメーションをページのスクロール幅に含めない。 */
+main{overflow-x:clip}
+@media(max-width:599px){.courses-stacked .course-navigation{bottom:0;left:0;right:0;padding:0 20px 13px}}
