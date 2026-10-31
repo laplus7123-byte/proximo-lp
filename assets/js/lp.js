@@ -23,8 +23,8 @@
     return changed;
   }
   measureViewport();
-  const header = $('#site-header'), floating = $('#floating-line'), curriculum = $('#journey');
-  let courseTrigger = null, courseStops = [], framePending = false, refreshTimer;
+  const curriculum = $('#journey');
+  let courseTrigger = null, courseStops = [], refreshTimer;
   if (canAnimate) {
     gsap.registerPlugin(ScrollTrigger);
     ScrollTrigger.config({ ignoreMobileResize: true });
@@ -36,27 +36,6 @@
     clearTimeout(viewportTimer);
     viewportTimer = setTimeout(() => { if (canAnimate) ScrollTrigger.refresh(); }, 180);
   }, { passive: true });
-
-  function updateChrome() {
-    framePending = false;
-    const headerBottom = header.offsetHeight;
-    header.classList.toggle('is-dark', $$('[data-dark]').some(section => {
-      const r = section.getBoundingClientRect();
-      return r.top <= headerBottom / 2 && r.bottom > headerBottom / 2;
-    }));
-    const r = curriculum.getBoundingClientRect();
-    const overCourse = r.top < innerHeight * .8 && r.bottom > headerBottom;
-    const show = $('#top').getBoundingClientRect().bottom < headerBottom && $('#contact').getBoundingClientRect().top >= innerHeight && !overCourse;
-    floating.classList.toggle('is-visible', show);
-    floating.setAttribute('aria-hidden', String(!show));
-    floating.tabIndex = show ? 0 : -1;
-  }
-  function queueChrome() {
-    if (!framePending) { framePending = true; requestAnimationFrame(updateChrome); }
-  }
-  addEventListener('scroll', queueChrome, { passive: true });
-  addEventListener('resize', queueChrome, { passive: true });
-  updateChrome();
 
   const opening = $('#opening');
   let openingTimeline, openingTimer, heroStarted = false;
@@ -72,7 +51,7 @@
     openingTimeline?.kill(); clearTimeout(openingTimer);
     const hadFocus = document.activeElement === opening;
     opening.hidden = true;
-    if (hadFocus) $('.brand').focus({ preventScroll: true });
+    if (hadFocus) $('#hero-title').focus({ preventScroll: true });
     animateHero();
   }
   let firstVisit = true;
@@ -143,19 +122,18 @@
       const hero = $('#top'), stage = $('.hero-stage');
       const pinTarget = compact ? $('.hero-transform') : stage;
       context.add('buildHero', () => {
-        if (!compact && pinTarget.offsetHeight > viewportHeight - header.offsetHeight + 2) return;
+        if (!compact && pinTarget.offsetHeight > viewportHeight + 2) return;
         hero.classList.add('hero-is-pinned');
         stage.dataset.phase = 'athlete';
         gsap.set(stage, { '--hero-cut': '100%', '--hero-progress': 0 });
         const tl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: {
           id: 'proximo-hero', trigger: pinTarget,
-          start: () => `top top+=${header.offsetHeight}`,
+          start: 'top top',
           end: () => `+=${Math.round(viewportHeight * (compact ? 1.1 : 1.45))}`,
           pin: true, scrub: .35, anticipatePin: 1,
           onUpdate: self => {
             stage.style.setProperty('--hero-progress', self.progress);
             stage.dataset.phase = self.progress < .52 ? 'athlete' : 'business';
-            queueChrome();
           }
         } });
         tl.to({}, { duration: 1 }, 0)
@@ -169,7 +147,6 @@
         stage.removeAttribute('data-phase');
         stage.style.removeProperty('--hero-cut');
         stage.style.removeProperty('--hero-progress');
-        queueChrome();
       };
     });
 
@@ -211,7 +188,7 @@
       const panels = $$('.course-panel'), links = $$('.course-navigation a');
       const stage = $('.course-stage'), track = $('.course-track');
       const gap = () => innerWidth < 600 ? 10 : 14;
-      const cardTop = i => header.offsetHeight + 18 + i * gap();
+      const cardTop = i => 18 + i * gap();
       const readTravel = (panel, i) => Math.max(0, cardTop(i) + $('.course-panel-inner', panel).offsetHeight - (stage.clientHeight - 82));
       curriculum.classList.add('courses-pinned', 'courses-stacked');
       // WebKitではクラス切替直後のsvh・背景色の取得が不安定になるため、先に確定。
@@ -268,7 +245,7 @@
           onUpdate: self => {
             let active = 0;
             changePoints.forEach((point, i) => { if (self.progress >= point) active = i; });
-            activate(active); queueChrome();
+            activate(active);
           }
         });
         // QAとナビで同じ読書位置を参照。個別カードの高さに追従する。
@@ -286,7 +263,6 @@
         delete stage.dataset.courseTransitions;
         panels.forEach(panel => { panel.removeAttribute('aria-hidden'); panel.inert = false; panel.style.removeProperty('--stack-index'); });
         links.forEach(link => { link.removeAttribute('aria-current'); link.classList.remove('is-active'); });
-        queueChrome();
       };
     });
   }
@@ -301,7 +277,7 @@
       const target = document.getElementById(link.hash.slice(1));
       if (!target || event.defaultPrevented) return;
       event.preventDefault();
-      const top = Math.max(0, scrollY + target.getBoundingClientRect().top - header.offsetHeight - 16);
+      const top = Math.max(0, scrollY + target.getBoundingClientRect().top - 16);
       history.pushState(null, '', link.hash);
       scrollTo({ top, behavior: motion.matches ? 'instant' : 'smooth' });
       if (event.detail === 0) {
@@ -310,7 +286,7 @@
       }
     });
   });
-  motion.addEventListener('change', () => { if (motion.matches) finishOpening(); queueChrome(); });
+  motion.addEventListener('change', () => { if (motion.matches) finishOpening(); });
   document.fonts?.ready.then(() => { if (canAnimate) ScrollTrigger.refresh(); });
-  addEventListener('load', () => { if (canAnimate) ScrollTrigger.refresh(); updateChrome(); });
+  addEventListener('load', () => { if (canAnimate) ScrollTrigger.refresh(); });
 })();
