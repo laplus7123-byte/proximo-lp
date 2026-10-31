@@ -167,3 +167,11 @@ main{overflow-x:clip}
   .courses-stacked .course-visual{height:100%;min-height:0}
   .courses-stacked .course-image{height:100%;max-height:none}
 }
+
+/* Q&Aの人物と吹き出しは別の列に置き、顔に重ねない。 */
+.faq-art{display:grid;grid-template-columns:minmax(0,225px) 130px;gap:16px;align-items:start;width:371px}
+.faq-bubble{position:relative;inset:auto;width:100%;margin-top:10px}
+@media(max-width:599px){
+  .faq-art{grid-template-columns:minmax(0,185px) 110px;gap:12px;width:307px}
+  .faq-bubble{inset:auto;width:100%;margin-top:8px}
+}
