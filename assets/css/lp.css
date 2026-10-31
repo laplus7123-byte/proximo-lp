@@ -180,7 +180,7 @@ main{overflow-x:clip}
 .contact-orbit{--contact-size:144px;position:fixed;z-index:90;right:max(28px,env(safe-area-inset-right));bottom:max(24px,env(safe-area-inset-bottom));display:grid;place-items:center;width:var(--contact-size);height:var(--contact-size);border:1px solid var(--blue);border-radius:50%;background:#fff;color:var(--navy);text-align:center;text-decoration:none}
 .contact-orbit-ring{position:absolute;inset:3px;width:calc(100% - 6px);height:calc(100% - 6px);fill:var(--blue);font:600 10px Montserrat,sans-serif;animation:contact-orbit-turn 24s linear infinite;pointer-events:none}
 .contact-orbit-label{font-size:13px;font-weight:700;line-height:1.65;pointer-events:none}
-.contact-orbit-arrow{display:block;font-family:Arial,sans-serif;font-size:23px;font-weight:400;line-height:1.1;margin-top:3px}
+.contact-orbit-mail{display:block;width:24px;height:24px;margin:5px auto 0;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .contact-orbit:focus-visible{outline:3px solid var(--blue);outline-offset:5px}
 .contact-orbit:focus-visible .contact-orbit-ring{animation-play-state:paused}
 @media(hover:hover){.contact-orbit:hover .contact-orbit-ring{animation-play-state:paused}.contact-orbit:hover{background:var(--gray)}}
@@ -191,7 +191,7 @@ main{overflow-x:clip}
 @media(max-width:1023px) and (min-width:600px){.courses-stacked .course-navigation{right:180px;gap:18px}}
 @media(max-width:599px){
   .contact-orbit{--contact-size:104px;right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom))}
-  .contact-orbit-label{font-size:11px;line-height:1.6}.contact-orbit-arrow{font-size:20px;margin-top:2px}
+  .contact-orbit-label{font-size:11px;line-height:1.6}.contact-orbit-mail{width:20px;height:20px;margin-top:4px}
   .courses-stacked .course-panel-inner{height:min(520px,calc(var(--viewport-height,100svh) - 190px))}
   .courses-stacked .course-navigation{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 8px;padding:0 132px max(12px,env(safe-area-inset-bottom)) 16px;align-items:stretch}
   .courses-stacked .course-navigation a{font-size:10px;line-height:1.5;min-height:44px;word-break:normal}
@@ -199,3 +199,12 @@ main{overflow-x:clip}
   .site-footer{padding-bottom:144px}
 }
 @media(prefers-reduced-motion:reduce){.contact-orbit-ring{animation:none}}
+
+/* パートナー無料の項目削除後は、残る3項目を均等に配置する。 */
+.season-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:599px){
+  .season-grid{grid-template-columns:1fr;gap:28px}
+  .season-grid article{display:grid;grid-template-columns:32px minmax(0,1fr);column-gap:18px}
+  .season-grid .line-icon{grid-row:1/3;width:32px;height:32px;margin:0}
+  .season-grid h3{margin-bottom:8px}
+}
