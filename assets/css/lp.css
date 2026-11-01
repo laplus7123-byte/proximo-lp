@@ -281,13 +281,19 @@ main{overflow-x:clip}
   .final-cta{padding-top:calc(65px + var(--surface-curve))}
 }
 
-/* 固定CTAのNEXT CAREERと、右へつながるループ矢印。 */
+/* 資料CTAは下向き矢印だけをループ。文字と受け皿は静止。 */
 .download-ticket-career{display:flex;align-items:center;justify-content:center;gap:9px;flex-shrink:0;font:600 14px/18px Montserrat,sans-serif;letter-spacing:.035em;white-space:nowrap}
-.career-arrow{position:relative;display:block;width:24px;height:16px;overflow:hidden;flex:0 0 24px}
-.career-arrow-track{position:absolute;inset:0 auto 0 -100%;display:flex;width:200%;height:100%;animation:career-arrow-flow 2.2s cubic-bezier(.76,0,.24,1) infinite}
-.career-arrow-track svg{display:block;width:50%;height:100%;flex:0 0 50%;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-@keyframes career-arrow-flow{0%,20%{transform:translateX(0)}80%,100%{transform:translateX(50%)}}
-.download-ticket:focus-visible .career-arrow-track{animation-play-state:paused}
-@media(hover:hover){.download-ticket:hover .career-arrow-track{animation-play-state:paused}}
-@media(max-width:599px){.download-ticket-career{font-size:12px;line-height:16px;gap:7px}.career-arrow{height:16px}}
-@media(prefers-reduced-motion:reduce){.career-arrow-track{animation:none}}
+.career-arrow{display:block;width:24px;height:16px;flex:0 0 24px}
+.career-arrow svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.download-symbol{position:relative;display:block;width:24px;height:24px;flex:0 0 24px}
+.download-arrow-window{position:absolute;inset:0 0 auto;height:75%;overflow:hidden}
+.download-arrow-track{position:absolute;top:-100%;left:0;width:100%;height:200%;display:flex;flex-direction:column;animation:download-arrow-flow 2.2s cubic-bezier(.76,0,.24,1) infinite}
+.download-arrow-track svg{display:block;width:100%;height:50%;flex:0 0 50%;max-width:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.download-symbol>.download-tray{position:absolute;inset:0;display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+@keyframes download-arrow-flow{0%,20%{transform:translateY(0)}80%,100%{transform:translateY(50%)}}
+[data-download-link]:focus-visible .download-arrow-track{animation-play-state:paused}
+@media(hover:hover){[data-download-link]:hover .download-arrow-track{animation-play-state:paused}}
+.download-cta .line-button-label{white-space:nowrap}
+@media(max-width:599px){.download-ticket-career{font-size:12px;line-height:16px;gap:7px}.download-ticket .download-symbol{width:22px;height:22px;flex-basis:22px}.download-cta{gap:10px;padding-inline:18px}}
+@media(max-width:374px){.download-cta{gap:8px;padding-inline:16px}}
+@media(prefers-reduced-motion:reduce){.download-arrow-track{animation:none}}
