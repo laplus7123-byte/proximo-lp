@@ -216,20 +216,67 @@ main{overflow-x:clip}
 
 #download-title:focus{outline:none}
 
-/* スクロール案内：静かな文字と、下へ流れ続ける矢印。 */
-.hero-scroll-guide.scroll-prompt,.scroll-cue.scroll-prompt{display:inline-flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:20px;min-width:146px;min-height:48px;padding:6px 7px 6px 23px;border:1px solid var(--blue);border-radius:999px;background:rgba(255,255,255,.94);color:var(--blue);font:600 11px/1 Montserrat,sans-serif;letter-spacing:.18em;text-decoration:none;transition:background-color .25s,color .25s}
+/* スクロール案内は文字と一本の線だけ。線が下へ流れる動きは継続。 */
+.hero-scroll-guide.scroll-prompt,.scroll-cue.scroll-prompt{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;gap:18px;min-width:100px;min-height:44px;padding:4px 10px;background:transparent;color:var(--navy);font:500 11px/1 Montserrat,sans-serif;letter-spacing:.16em;text-decoration:none}
 .scroll-prompt span{margin:0;font-size:inherit}.scroll-prompt .scroll-label{display:block}
-.scroll-prompt .scroll-icon{position:relative;display:block;width:32px;height:32px;flex:0 0 32px;border-radius:50%;overflow:hidden;background:var(--blue);color:white}
-.scroll-prompt .scroll-arrow-track{position:absolute;top:-100%;left:0;display:flex;flex-direction:column;width:100%;height:200%;animation:scroll-arrow-flow 2.4s cubic-bezier(.76,0,.24,1) infinite}
-.scroll-arrow-track svg{display:block;width:100%;height:50%;flex:0 0 50%;padding:6px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-@keyframes scroll-arrow-flow{0%,22%{transform:translateY(0)}78%,100%{transform:translateY(50%)}}
-.scroll-prompt:focus-visible .scroll-arrow-track{animation-play-state:paused}
-@media(hover:hover){.hero-scroll-guide.scroll-prompt:hover,.scroll-cue.scroll-prompt:hover{background:#eaf4fd}.scroll-prompt:hover .scroll-arrow-track{animation-play-state:paused}}
+.scroll-prompt .scroll-line{position:relative;display:block;width:1px;height:30px;flex:0 0 1px;overflow:hidden;background:rgba(5,25,40,.18)}
+.scroll-line::after{content:"";position:absolute;inset:0 0 auto;height:14px;background:currentColor;animation:scroll-line-flow 2.4s cubic-bezier(.65,0,.35,1) infinite}
+@keyframes scroll-line-flow{0%,12%{transform:translateY(-110%)}78%,100%{transform:translateY(230%)}}
+.scroll-prompt:focus-visible .scroll-line::after{animation-play-state:paused}
+@media(hover:hover){.scroll-prompt:hover .scroll-line::after{animation-play-state:paused}}
 @media(min-width:600px) and (max-width:899px){.hero-scroll-guide.scroll-prompt{left:40px;bottom:32px;transform:none}}
+@media(max-width:599px){.hero-scroll-guide.scroll-prompt{bottom:108px}.hero-scroll .hero-bottom{height:auto;min-height:70px;padding-block:12px}}
+@media(prefers-reduced-motion:reduce){.scroll-prompt .scroll-line::after{animation:none;height:100%;transform:none}}
+
+/* VESSEL参考：大きな色面とゆるやかな曲線。PRÓXIMOの青で統一する。 */
+:root{--ice:#edf5fa;--surface-curve:clamp(36px,6vw,86px)}
+.hero-summary{background:var(--ice);padding-top:var(--surface-curve)}
+.hero-summary::before{content:"";position:absolute;inset:0 0 auto;height:var(--surface-curve);background:white;clip-path:ellipse(72% 100% at 50% 0);pointer-events:none}
+.hero-scroll .hero-bottom{background:transparent}
+.data-section{background:var(--ice);padding-top:100px;padding-bottom:130px}
+.features-heading{padding-top:100px;padding-bottom:calc(85px + var(--surface-curve))}
+.feature-band{clip-path:none;margin-top:0;padding:calc(90px + var(--surface-curve)) 0 110px;--previous-surface:white}
+.feature-band::before{content:"";position:absolute;inset:0 0 auto;height:var(--surface-curve);background:var(--previous-surface);clip-path:ellipse(72% 100% at 45% 0);pointer-events:none}
+.feature-band-one{background:var(--ice)}
+.feature-band-two{--previous-surface:var(--ice);background:var(--blue)}
+.feature-band-three{--previous-surface:var(--blue);background:var(--ice);padding-bottom:110px}
+.feature-band-two::before{clip-path:ellipse(78% 100% at 70% 0)}
+.support-section{background:var(--ice)}
+.season-section{padding-bottom:100px}
+.start-section,.season-section + .start-section{position:relative;background:var(--blue);color:white;padding-top:calc(82px + var(--surface-curve));padding-bottom:106px}
+.start-section::before,.faq-section::before,.final-cta::after{content:"";position:absolute;inset:0 0 auto;height:var(--surface-curve);background:white;clip-path:ellipse(72% 100% at 50% 0);pointer-events:none}
+.start-section h2{text-align:center;font-size:40px;line-height:1.55;max-width:none}
+.start-section .start-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;list-style:none;padding:0;margin:66px 0 0;align-items:stretch}
+.start-section .start-step{display:block;padding:0 30px;text-align:center}
+.start-section .start-step + .start-step{border-left:1px solid rgba(255,255,255,.32)}
+.start-section .start-step p{color:inherit;font-size:14px;line-height:1.95}
+.start-section .start-step .step-label{display:flex;align-items:center;justify-content:center;gap:10px;font:600 13px/1 Montserrat,sans-serif;letter-spacing:.12em;margin:0}
+.step-index{display:grid;place-items:center;width:34px;height:34px;border:1.5px solid currentColor;border-radius:50%;font:500 18px/1 Montserrat,sans-serif;letter-spacing:0}
+.start-section .start-step h3{font-size:23px;line-height:1.5;margin:23px 0 15px;white-space:nowrap}
+.start-section .step-description{opacity:.94}
+.start-action{display:flex;justify-content:center;margin-top:58px}
+.start-action .line-button{min-width:330px;font-size:14px}
+.faq-section{position:relative;background:var(--ice);padding-top:calc(94px + var(--surface-curve));padding-bottom:130px}
+.faq-section::before{background:var(--blue);clip-path:ellipse(80% 100% at 35% 0)}
+.final-cta{clip-path:none;margin-top:0;padding-top:calc(100px + var(--surface-curve))}
+.final-cta::after{background:var(--ice)}
+@media(min-width:600px) and (max-width:1023px){.start-section .start-step{padding-inline:16px}.start-section .start-step h3{font-size:19px}}
 @media(max-width:599px){
-  .hero-scroll-guide.scroll-prompt,.scroll-cue.scroll-prompt{min-width:132px;min-height:44px;padding:6px 7px 6px 20px;gap:16px;font-size:10px}
-  .scroll-prompt .scroll-icon{width:30px;height:30px;flex-basis:30px}
-  .hero-scroll-guide.scroll-prompt{bottom:108px}
-  .hero-scroll .hero-bottom{height:auto;min-height:70px;padding-block:12px}
+  .data-section{padding-top:68px;padding-bottom:86px}
+  .features-heading{padding-top:76px;padding-bottom:80px}
+  .feature-band{padding:calc(40px + var(--surface-curve)) 0 76px}
+  .feature-band-three{padding-bottom:76px}
+  .season-section{padding-bottom:70px}
+  .start-section,.season-section + .start-section{padding-top:calc(45px + var(--surface-curve));padding-bottom:74px}
+  .start-section h2{font-size:29px;line-height:1.6}
+  .start-section .start-steps{grid-template-columns:1fr;margin-top:22px}
+  .start-section .start-step{padding:28px 0}
+  .start-section .start-step + .start-step{border-left:0;border-top:1px solid rgba(255,255,255,.28)}
+  .start-section .start-step .step-label{font-size:12px;gap:9px}
+  .step-index{width:30px;height:30px;font-size:16px}
+  .start-section .start-step h3{font-size:22px;margin:14px 0 9px}
+  .start-section .start-step p{font-size:13px;line-height:1.9}
+  .start-action{margin-top:12px}.start-action .line-button{min-width:0;width:100%;max-width:330px}
+  .faq-section{padding-top:calc(54px + var(--surface-curve));padding-bottom:86px}
+  .final-cta{padding-top:calc(65px + var(--surface-curve))}
 }
-@media(prefers-reduced-motion:reduce){.scroll-prompt .scroll-arrow-track{animation:none}.hero-scroll-guide.scroll-prompt,.scroll-cue.scroll-prompt{transition:none}}
