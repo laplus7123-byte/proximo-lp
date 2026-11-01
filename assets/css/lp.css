@@ -291,5 +291,3 @@ main{overflow-x:clip}
 @media(hover:hover){.download-ticket:hover .career-arrow-track{animation-play-state:paused}}
 @media(max-width:599px){.download-ticket-career{font-size:12px;line-height:16px;gap:7px}.career-arrow{height:16px}}
 @media(prefers-reduced-motion:reduce){.career-arrow-track{animation:none}}
-
-
