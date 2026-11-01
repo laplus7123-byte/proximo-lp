@@ -69,6 +69,22 @@
       .to(opening, { yPercent: -100, duration: .5, ease: 'power2.inOut' }, 1.2);
   } else { animateHero(); }
 
+  const downloadDialog = $('#download-dialog');
+  let savedBodyOverflow = '', downloadOpener;
+  $$('[data-download-link]').forEach(link => link.addEventListener('click', event => {
+    if (!downloadDialog?.showModal) return;
+    event.preventDefault();
+    downloadOpener = link;
+    savedBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    downloadDialog.showModal();
+  }));
+  downloadDialog?.addEventListener('close', () => { document.body.style.overflow = savedBodyOverflow; downloadOpener?.focus({ preventScroll: true }); });
+  downloadDialog?.addEventListener('click', event => {
+    const r = downloadDialog.getBoundingClientRect();
+    if (event.target === downloadDialog && (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom)) downloadDialog.close();
+  });
+
   const loop = $('.lecture-loops'), toggle = $('#marquee-toggle');
   toggle.addEventListener('click', () => {
     const paused = loop.classList.toggle('is-paused');
@@ -187,7 +203,7 @@
       if (!context.conditions.motion || viewportHeight < (context.conditions.phone ? 560 : 600)) return;
       const panels = $$('.course-panel'), links = $$('.course-navigation a');
       const stage = $('.course-stage'), track = $('.course-track');
-      const gap = () => innerWidth < 600 ? 10 : 14;
+      const gap = () => innerWidth < 600 ? 6 : 14;
       const cardTop = i => 18 + i * gap();
       const readTravel = (panel, i) => Math.max(0, cardTop(i) + $('.course-panel-inner', panel).offsetHeight - (stage.clientHeight - 82));
       curriculum.classList.add('courses-pinned', 'courses-stacked');
